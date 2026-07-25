@@ -1,179 +1,233 @@
 <script setup>
-import { computed, watch } from 'vue'
-import {
-  PhSquaresFour,
-  PhCircleNotch,
-  PhWarningCircle,
-  PhFolderSimpleDashed,
-  PhCheckCircle,
-  PhListChecks,
-} from '@phosphor-icons/vue'
+/**
+ * OverviewPage — the dashboard.
+ *
+ * Shows a headline "featured" card (the most recent complete audit if
+ * available, otherwise the most recently touched), a summary triple of
+ * totals, and a list of the top open audits.
+ *
+ * Explicitly renders four states: loading / error / empty / populated.
+ */
+import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { PhPlus, PhListChecks } from '@phosphor-icons/vue'
 import { useAudits } from '@/composables/useAudits.js'
+import { scoreForRatings, severityCounts } from '@/utils/scoring.js'
+import { formatRelative, statusLabel } from '@/utils/format.js'
+import BaseCard from '@/components/BaseCard.vue'
+import BaseButton from '@/components/BaseButton.vue'
+import PageHeader from '@/components/PageHeader.vue'
+import LoadingState from '@/components/LoadingState.vue'
+import ErrorState from '@/components/ErrorState.vue'
+import EmptyState from '@/components/EmptyState.vue'
+import AuditListItem from '@/components/AuditListItem.vue'
+import ScoreRing from '@/components/ScoreRing.vue'
+import SeverityDistribution from '@/components/SeverityDistribution.vue'
+
+const router = useRouter()
 
 const {
   audits,
-  frameworks,
   isLoading,
   error,
   isEmpty,
   totalCount,
   activeAudits,
   completedAudits,
+  openAudits,
   reload,
 } = useAudits()
 
-const platformLabel = {
-  ios: 'iOS',
-  android: 'Android',
-  web: 'Web',
-  desktop: 'Desktop',
+// Featured card: prefer the most recent complete audit; fall back to
+// the most recent in-progress; otherwise the most recent draft.
+const featuredAudit = computed(() => {
+  if (completedAudits.value.length > 0) return completedAudits.value[0]
+  if (activeAudits.value.length > 0) {
+    return activeAudits.value
+      .slice()
+      .sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1))[0]
+  }
+  return audits.value
+    .slice()
+    .sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1))[0]
+})
+
+const featuredScore = computed(() =>
+  featuredAudit.value ? scoreForRatings(featuredAudit.value.ratings) : 0,
+)
+
+const featuredCounts = computed(() =>
+  featuredAudit.value
+    ? severityCounts(featuredAudit.value.ratings)
+    : { pass: 0, warning: 0, critical: 0, total: 0 },
+)
+
+// List of open audits capped at 3 so the dashboard stays scannable.
+const topOpenAudits = computed(() => openAudits.value.slice(0, 3))
+
+function goNew() {
+  router.push({ name: 'new-audit' })
 }
 
-// Sort the top-of-mind list: most recently updated first.
-const recentAudits = computed(() =>
-  audits.value.slice().sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1)),
-)
-
-// Log a sample response once, when data first arrives, so we can verify
-// the shape at runtime during Phase 4 review. Phase 9 will remove.
-watch(
-  () => audits.value.length,
-  (count) => {
-    if (count > 0) {
-      // eslint-disable-next-line no-console
-      console.log('[Phase 4] audits sample:', audits.value[0])
-      // eslint-disable-next-line no-console
-      console.log('[Phase 4] frameworks sample:', frameworks.value[0])
-    }
-  },
-  { immediate: false },
-)
+function openAudit(id) {
+  router.push({ name: 'audit-detail', params: { id } })
+}
 </script>
 
 <template>
-  <section class="overview" aria-labelledby="overview-title">
-    <header class="overview__header">
-      <span class="overview__icon" aria-hidden="true">
-        <PhSquaresFour :size="28" weight="duotone" />
-      </span>
-      <div>
-        <p class="overview__eyebrow">Dashboard</p>
-        <h1 id="overview-title" class="overview__title">Overview</h1>
-      </div>
-    </header>
-
-    <!-- Loading -->
-    <div
-      v-if="isLoading"
-      class="card state"
-      role="status"
-      aria-live="polite"
+  <section aria-labelledby="overview-title" class="page">
+    <PageHeader
+      eyebrow="Dashboard"
+      title="Overview"
+      title-id="overview-title"
+      description="Your rapid pulse-check on every audit in flight."
     >
-      <span class="state__icon state__icon--spin" aria-hidden="true">
-        <PhCircleNotch :size="24" weight="bold" />
-      </span>
-      <p class="state__text">Loading your audits…</p>
-    </div>
+      <template #action>
+        <BaseButton variant="primary" size="sm" @click="goNew">
+          <template #leading><PhPlus :size="14" weight="bold" /></template>
+          New audit
+        </BaseButton>
+      </template>
+    </PageHeader>
 
-    <!-- Error -->
-    <div
+    <LoadingState v-if="isLoading" message="Loading your audits…" />
+
+    <ErrorState
       v-else-if="error"
-      class="card state state--error"
-      role="alert"
-    >
-      <span class="state__icon" aria-hidden="true">
-        <PhWarningCircle :size="24" weight="fill" />
-      </span>
-      <div class="state__body">
-        <p class="state__title">Couldn't load audits</p>
-        <p class="state__text">{{ error }}</p>
-      </div>
-      <v-btn color="primary" size="small" @click="reload">Try again</v-btn>
-    </div>
+      title="Couldn’t load audits"
+      :message="error"
+      @retry="reload"
+    />
 
-    <!-- Empty -->
-    <div
+    <EmptyState
       v-else-if="isEmpty"
-      class="card state"
+      :icon="PhListChecks"
+      title="No audits yet"
+      description="Start your first heuristic audit and it will appear here."
     >
-      <span class="state__icon" aria-hidden="true">
-        <PhFolderSimpleDashed :size="24" weight="duotone" />
-      </span>
-      <div class="state__body">
-        <p class="state__title">No audits yet</p>
-        <p class="state__text">Start a new audit to begin evaluating a product.</p>
-      </div>
-    </div>
+      <template #action>
+        <BaseButton variant="primary" @click="goNew">
+          <template #leading><PhPlus :size="14" weight="bold" /></template>
+          Start an audit
+        </BaseButton>
+      </template>
+    </EmptyState>
 
-    <!-- Populated -->
     <template v-else>
-      <div class="card summary">
-        <div class="summary__stat">
-          <p class="summary__label">Total audits</p>
-          <p class="summary__value">{{ totalCount }}</p>
+      <!-- Featured -->
+      <BaseCard v-if="featuredAudit" padding="md" class="feature">
+        <div class="feature__ring">
+          <ScoreRing
+            :value="featuredScore"
+            :size="140"
+            :label="statusLabel(featuredAudit.status)"
+          />
         </div>
-        <div class="summary__stat">
-          <p class="summary__label">In progress</p>
-          <p class="summary__value">{{ activeAudits.length }}</p>
-        </div>
-        <div class="summary__stat">
-          <p class="summary__label">Complete</p>
-          <p class="summary__value">{{ completedAudits.length }}</p>
-        </div>
-      </div>
-
-      <ul class="audit-list" aria-label="Recent audits">
-        <li
-          v-for="a in recentAudits"
-          :key="a.id"
-          class="card card--nested audit-list__item"
-        >
-          <div class="audit-list__meta">
-            <span class="chip">{{ platformLabel[a.platform] }}</span>
-            <span class="chip chip--status" :data-status="a.status">
-              {{ a.status.replace('-', ' ') }}
-            </span>
-          </div>
-          <p class="audit-list__title">{{ a.productName }}</p>
-          <p class="audit-list__sub">
-            <PhListChecks :size="14" weight="bold" aria-hidden="true" />
-            <span>{{ a.ratings.length }} ratings</span>
-            <span aria-hidden="true">·</span>
-            <PhCheckCircle :size="14" weight="bold" aria-hidden="true" />
-            <span>{{ a.ratings.filter((r) => r.severity === 'pass').length }} pass</span>
+        <div class="feature__body">
+          <p class="feature__eyebrow">Featured audit</p>
+          <p class="feature__name">{{ featuredAudit.productName }}</p>
+          <p class="feature__meta">
+            Updated {{ formatRelative(featuredAudit.updatedAt) }}
           </p>
-        </li>
-      </ul>
+          <SeverityDistribution
+            v-if="featuredCounts.total > 0"
+            :pass="featuredCounts.pass"
+            :warning="featuredCounts.warning"
+            :critical="featuredCounts.critical"
+          />
+          <div class="feature__actions">
+            <BaseButton
+              variant="secondary"
+              size="sm"
+              @click="openAudit(featuredAudit.id)"
+            >
+              Open audit
+            </BaseButton>
+          </div>
+        </div>
+      </BaseCard>
+
+      <!-- Summary counts -->
+      <BaseCard padding="md">
+        <div class="summary" role="list">
+          <div class="summary__stat" role="listitem">
+            <p class="summary__label">Total</p>
+            <p class="summary__value">{{ totalCount }}</p>
+          </div>
+          <div class="summary__stat" role="listitem">
+            <p class="summary__label">Active</p>
+            <p class="summary__value">{{ activeAudits.length }}</p>
+          </div>
+          <div class="summary__stat" role="listitem">
+            <p class="summary__label">Complete</p>
+            <p class="summary__value">{{ completedAudits.length }}</p>
+          </div>
+        </div>
+      </BaseCard>
+
+      <!-- Open audits list -->
+      <section aria-labelledby="open-title" class="group">
+        <div class="group__header">
+          <h2 id="open-title" class="group__title">Open audits</h2>
+          <router-link :to="{ name: 'audits' }" class="group__link">
+            See all
+          </router-link>
+        </div>
+
+        <EmptyState
+          v-if="topOpenAudits.length === 0"
+          :icon="PhListChecks"
+          title="Nothing in flight"
+          description="Every open audit has been completed. Start a new one to keep the momentum."
+        >
+          <template #action>
+            <BaseButton variant="primary" size="sm" @click="goNew">
+              <template #leading><PhPlus :size="14" weight="bold" /></template>
+              New audit
+            </BaseButton>
+          </template>
+        </EmptyState>
+
+        <ul v-else class="list">
+          <li v-for="audit in topOpenAudits" :key="audit.id">
+            <AuditListItem :audit="audit" />
+          </li>
+        </ul>
+      </section>
     </template>
   </section>
 </template>
 
 <style scoped>
-.overview {
+.page {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
 }
 
-.overview__header {
+.feature {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-4);
+  flex-wrap: wrap;
 }
 
-.overview__icon {
-  display: inline-flex;
+.feature__ring {
+  flex-shrink: 0;
+  display: flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-full);
-  background: var(--gradient-accent);
-  color: var(--color-text-on-accent);
-  flex-shrink: 0;
 }
 
-.overview__eyebrow {
+.feature__body {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.feature__eyebrow {
   font-size: var(--font-size-meta);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-tertiary);
@@ -181,76 +235,22 @@ watch(
   letter-spacing: 0.08em;
 }
 
-.overview__title {
-  font-size: var(--font-size-h2);
+.feature__name {
+  font-size: var(--font-size-h3);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
   line-height: var(--line-height-snug);
 }
 
-.card {
-  background: var(--color-surface-card);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
-  padding: var(--space-4);
-}
-
-.card--nested {
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-card-nested);
-  box-shadow: var(--shadow-nested);
-  padding: var(--space-3);
-}
-
-/* ---------- State: loading / error / empty ---------- */
-.state {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  min-height: 96px;
-}
-
-.state__icon {
-  display: inline-flex;
-  color: var(--color-text-secondary);
-  flex-shrink: 0;
-}
-
-.state--error .state__icon {
-  color: var(--color-critical);
-}
-
-.state__icon--spin {
-  animation: spin 900ms linear infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .state__icon--spin { animation: none; }
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.state__body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.state__title {
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
-}
-
-.state__text {
+.feature__meta {
   font-size: var(--font-size-body-sm);
   color: var(--color-text-secondary);
 }
 
-/* ---------- Summary ---------- */
+.feature__actions {
+  padding-top: var(--space-1);
+}
+
 .summary {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -260,87 +260,68 @@ watch(
 .summary__stat {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: 2px;
 }
 
 .summary__label {
   font-size: var(--font-size-meta);
   color: var(--color-text-tertiary);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
+  font-weight: var(--font-weight-medium);
 }
 
 .summary__value {
-  font-size: 1.75rem;
+  font-size: var(--font-size-h2);
   font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-tight);
-  background: var(--gradient-accent);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--color-text-primary);
+  line-height: 1;
 }
 
-/* ---------- Audit list ---------- */
-.audit-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.group {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
 }
 
-.audit-list__item {
+.group__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.group__title {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.group__link {
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-accent-end);
+  text-decoration: none;
+  padding: 4px 8px;
+  border-radius: var(--radius-input);
+}
+
+.group__link:hover {
+  background: color-mix(in srgb, var(--color-accent-end) 10%, transparent);
+}
+
+.group__link:focus-visible {
+  outline: 2px solid var(--color-accent-end);
+  outline-offset: 2px;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-}
-
-.audit-list__meta {
-  display: flex;
-  gap: var(--space-2);
-  flex-wrap: wrap;
-}
-
-.audit-list__title {
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
-}
-
-.audit-list__sub {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--font-size-body-sm);
-  color: var(--color-text-secondary);
-}
-
-.chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px var(--space-2);
-  border-radius: var(--radius-pill);
-  font-size: var(--font-size-meta);
-  font-weight: var(--font-weight-medium);
-  background: var(--color-border-subtle);
-  color: var(--color-text-primary);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.chip--status[data-status='in-progress'] {
-  background: color-mix(in srgb, var(--color-warning) 18%, transparent);
-  color: color-mix(in srgb, var(--color-warning) 60%, var(--color-text-primary));
-}
-
-.chip--status[data-status='complete'] {
-  background: color-mix(in srgb, var(--color-pass) 18%, transparent);
-  color: color-mix(in srgb, var(--color-pass) 60%, var(--color-text-primary));
-}
-
-.chip--status[data-status='draft'] {
-  background: var(--color-border-subtle);
-  color: var(--color-text-secondary);
 }
 </style>

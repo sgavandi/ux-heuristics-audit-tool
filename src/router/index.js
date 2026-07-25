@@ -18,6 +18,19 @@ const routes = [
     meta: { title: 'Active Audits' },
   },
   {
+    path: '/audits/new',
+    name: 'new-audit',
+    component: () => import('@/pages/NewAuditPage.vue'),
+    meta: { title: 'New audit' },
+  },
+  {
+    path: '/audits/:id',
+    name: 'audit-detail',
+    component: () => import('@/pages/AuditDetailPage.vue'),
+    meta: { title: 'Audit' },
+    props: true,
+  },
+  {
     path: '/history',
     name: 'history',
     component: () => import('@/pages/HistoryPage.vue'),

@@ -23,6 +23,7 @@ export function useAudits({ autoLoad = true } = {}) {
     totalCount,
     activeAudits,
     completedAudits,
+    openAudits,
   } = storeToRefs(store)
 
   if (autoLoad) {
@@ -43,9 +44,17 @@ export function useAudits({ autoLoad = true } = {}) {
     totalCount,
     activeAudits,
     completedAudits,
+    openAudits,
+    // lookups
+    getAuditById: store.getAuditById,
+    getFrameworkById: store.getFrameworkById,
     // actions
     load: store.load,
     reload: () => store.load({ force: true }),
+    createAudit: store.createAudit,
+    setRating: store.setRating,
+    setStatus: store.setStatus,
+    removeAudit: store.removeAudit,
     reset: store.reset,
   }
 }
