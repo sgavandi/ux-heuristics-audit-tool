@@ -1,4 +1,5 @@
 import { createApp } from 'vue'
+import { createPinia } from 'pinia'
 
 // Inter font (loaded via Fontsource)
 import '@fontsource/inter/400.css'
@@ -72,4 +73,4 @@ const vuetify = createVuetify({
   },
 })
 
-createApp(App).use(router).use(vuetify).mount('#app')
+createApp(App).use(createPinia()).use(router).use(vuetify).mount('#app')
