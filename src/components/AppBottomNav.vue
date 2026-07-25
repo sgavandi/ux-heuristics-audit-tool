@@ -105,7 +105,7 @@ const activeName = computed(() => route.name)
 
   border-radius: var(--radius-pill);
   text-decoration: none;
-  color: var(--color-text-tertiary);
+  color: var(--color-text-secondary);
   font-size: var(--font-size-meta);
   font-weight: var(--font-weight-medium);
   line-height: 1;

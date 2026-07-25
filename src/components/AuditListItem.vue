@@ -163,15 +163,15 @@ const statusClass = computed(() => `chip chip--${props.audit.status}`)
 
 .chip--draft {
   background: color-mix(in srgb, var(--color-text-tertiary) 18%, transparent);
-  color: color-mix(in srgb, var(--color-text-tertiary) 90%, var(--color-text-primary));
+  color: var(--color-text-secondary);
 }
 .chip--in-progress {
   background: color-mix(in srgb, var(--color-warning) 18%, transparent);
-  color: color-mix(in srgb, var(--color-warning) 80%, var(--color-text-primary));
+  color: var(--color-warning-strong);
 }
 .chip--complete {
   background: color-mix(in srgb, var(--color-pass) 14%, transparent);
-  color: color-mix(in srgb, var(--color-pass) 80%, var(--color-text-primary));
+  color: var(--color-pass-strong);
 }
 
 .row__score {

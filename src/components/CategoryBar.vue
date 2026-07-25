@@ -117,7 +117,7 @@ const ariaLabel = computed(() => {
   align-items: center;
   padding-left: var(--space-3);
   font-size: var(--font-size-meta);
-  color: var(--color-text-tertiary);
+  color: var(--color-text-secondary);
   font-style: italic;
 }
 </style>

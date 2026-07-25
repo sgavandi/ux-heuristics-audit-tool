@@ -430,15 +430,15 @@ async function reopen() {
 
 .chip--draft {
   background: color-mix(in srgb, var(--color-text-tertiary) 18%, transparent);
-  color: color-mix(in srgb, var(--color-text-tertiary) 90%, var(--color-text-primary));
+  color: var(--color-text-secondary);
 }
 .chip--in-progress {
   background: color-mix(in srgb, var(--color-warning) 18%, transparent);
-  color: color-mix(in srgb, var(--color-warning) 80%, var(--color-text-primary));
+  color: var(--color-warning-strong);
 }
 .chip--complete {
   background: color-mix(in srgb, var(--color-pass) 14%, transparent);
-  color: color-mix(in srgb, var(--color-pass) 80%, var(--color-text-primary));
+  color: var(--color-pass-strong);
 }
 
 .group {
@@ -546,17 +546,17 @@ async function reopen() {
    never conveyed by color alone. */
 .sev--pass.sev--active {
   background: color-mix(in srgb, var(--color-pass) 14%, transparent);
-  color: color-mix(in srgb, var(--color-pass) 80%, var(--color-text-primary));
+  color: var(--color-pass-strong);
   border-color: color-mix(in srgb, var(--color-pass) 40%, transparent);
 }
 .sev--warning.sev--active {
   background: color-mix(in srgb, var(--color-warning) 18%, transparent);
-  color: color-mix(in srgb, var(--color-warning) 80%, var(--color-text-primary));
+  color: var(--color-warning-strong);
   border-color: color-mix(in srgb, var(--color-warning) 45%, transparent);
 }
 .sev--critical.sev--active {
   background: color-mix(in srgb, var(--color-critical) 16%, transparent);
-  color: color-mix(in srgb, var(--color-critical) 80%, var(--color-text-primary));
+  color: var(--color-critical-strong);
   border-color: color-mix(in srgb, var(--color-critical) 45%, transparent);
 }
 
@@ -577,8 +577,8 @@ async function reopen() {
   padding: 4px 6px;
   border-radius: var(--radius-input);
   font-size: var(--font-size-body-sm);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-accent-end);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-accent-strong);
   cursor: pointer;
   transition: background var(--transition-default);
 }

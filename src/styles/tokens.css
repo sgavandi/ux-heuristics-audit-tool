@@ -29,10 +29,15 @@
 
   /* ------------------------------------------------------------------
      Text
+     ------------------------------------------------------------------
+     Contrast on white (WCAG 2.2 AA):
+     - primary   Slate 900  ~19.3:1
+     - secondary Slate 600  ~ 7.2:1
+     - tertiary  Slate 500  ~ 4.6:1  (passes 4.5:1 for normal text)
      ------------------------------------------------------------------ */
   --color-text-primary:   #0F172A; /* Slate 900 */
-  --color-text-secondary: #64748B; /* Slate 500 */
-  --color-text-tertiary:  #94A3B8; /* Slate 400 */
+  --color-text-secondary: #475569; /* Slate 600 */
+  --color-text-tertiary:  #64748B; /* Slate 500 */
   --color-text-on-accent: #FFFFFF;
 
   /* ------------------------------------------------------------------
@@ -40,6 +45,7 @@
      ------------------------------------------------------------------ */
   --color-accent-start: #F43F5E; /* Rose 500 */
   --color-accent-end:   #8B5CF6; /* Violet 500 */
+  --color-accent-strong:#7C3AED; /* Violet 600 — accessible text on white */
 
   --gradient-accent: linear-gradient(
     135deg,
@@ -49,11 +55,18 @@
 
   /* ------------------------------------------------------------------
      Semantic Status — severity for heuristic ratings
+     ------------------------------------------------------------------
+     `*-strong` variants are the accessible on-tint text colors used for
+     chips and severity pills. Each meets ≥4.5:1 contrast on a 12–18%
+     tint of the same hue over white.
      ------------------------------------------------------------------ */
-  --color-pass:     #10B981; /* Emerald 500 */
-  --color-warning:  #F59E0B; /* Amber 500 */
-  --color-critical: #EF4444; /* Red 500 */
-  --color-info:     #3B82F6; /* Blue 500 */
+  --color-pass:            #10B981; /* Emerald 500 */
+  --color-pass-strong:     #065F46; /* Emerald 800 */
+  --color-warning:         #F59E0B; /* Amber 500 */
+  --color-warning-strong:  #92400E; /* Amber 800 */
+  --color-critical:        #EF4444; /* Red 500 */
+  --color-critical-strong: #991B1B; /* Red 800 */
+  --color-info:            #3B82F6; /* Blue 500 */
 
   /* ------------------------------------------------------------------
      Spacing Scale — 8px grid

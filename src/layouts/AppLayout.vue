@@ -4,9 +4,9 @@ import AppBottomNav from '@/components/AppBottomNav.vue'
 
 <template>
   <div class="shell">
-    <main class="shell__content">
+    <div class="shell__content">
       <slot />
-    </main>
+    </div>
     <AppBottomNav />
   </div>
 </template>

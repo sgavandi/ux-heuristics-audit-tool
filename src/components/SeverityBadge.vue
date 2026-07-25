@@ -72,14 +72,14 @@ const iconSize = computed(() => (props.size === 'sm' ? 12 : 14))
 
 .sev--pass {
   background: color-mix(in srgb, var(--color-pass) 14%, transparent);
-  color: color-mix(in srgb, var(--color-pass) 80%, var(--color-text-primary));
+  color: var(--color-pass-strong);
 }
 .sev--warning {
   background: color-mix(in srgb, var(--color-warning) 18%, transparent);
-  color: color-mix(in srgb, var(--color-warning) 80%, var(--color-text-primary));
+  color: var(--color-warning-strong);
 }
 .sev--critical {
   background: color-mix(in srgb, var(--color-critical) 16%, transparent);
-  color: color-mix(in srgb, var(--color-critical) 80%, var(--color-text-primary));
+  color: var(--color-critical-strong);
 }
 </style>
