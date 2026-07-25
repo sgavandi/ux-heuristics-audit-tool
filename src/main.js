@@ -20,6 +20,7 @@ import './styles/tokens.css'
 import './styles/global.css'
 
 import App from './App.vue'
+import router from './router'
 
 const vuetify = createVuetify({
   theme: {
@@ -71,4 +72,4 @@ const vuetify = createVuetify({
   },
 })
 
-createApp(App).use(vuetify).mount('#app')
+createApp(App).use(router).use(vuetify).mount('#app')
