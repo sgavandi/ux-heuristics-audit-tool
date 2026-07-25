@@ -19,6 +19,16 @@ import BaseCard from '@/components/BaseCard.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import BaseInput from '@/components/BaseInput.vue'
 import BaseSelect from '@/components/BaseSelect.vue'
+import ScoreRing from '@/components/ScoreRing.vue'
+import CategoryBar from '@/components/CategoryBar.vue'
+import SeverityBadge from '@/components/SeverityBadge.vue'
+import SeverityDistribution from '@/components/SeverityDistribution.vue'
+import { audits, frameworks } from '@/services/mockData'
+import {
+  scoreForRatings,
+  severityCounts,
+  categoryBreakdown,
+} from '@/utils/scoring'
 
 // Reactive state for input demos
 const productName = ref('')
@@ -31,6 +41,25 @@ const platformOptions = [
   { value: 'web', label: 'Web' },
   { value: 'desktop', label: 'Desktop' },
 ]
+
+// -------- Charts demo data (real mock audits + framework) --------
+const framework = frameworks[0]
+const inProgressAudit = audits.find((a) => a.status === 'in-progress')
+const completeAudit = audits.find((a) => a.status === 'complete')
+const draftAudit = audits.find((a) => a.status === 'draft')
+
+const inProgressScore = scoreForRatings(inProgressAudit.ratings)
+const completeScore = scoreForRatings(completeAudit.ratings)
+
+const completeCounts = severityCounts(completeAudit.ratings)
+const inProgressCounts = severityCounts(inProgressAudit.ratings)
+
+const completeBreakdown = categoryBreakdown(completeAudit, framework)
+const inProgressBreakdown = categoryBreakdown(inProgressAudit, framework)
+
+// Animate a ring value on mount to visualise the transition.
+const animatedScore = ref(0)
+setTimeout(() => { animatedScore.value = completeScore }, 150)
 </script>
 
 <template>
@@ -168,6 +197,101 @@ const platformOptions = [
       </BaseCard>
     </section>
 
+    <!-- Charts / data viz ------------------------------------------- -->
+    <section aria-labelledby="charts-title" class="group">
+      <h2 id="charts-title" class="group__title">Charts &amp; data viz</h2>
+
+      <!-- Score rings -->
+      <BaseCard padding="md" class="stack">
+        <p class="demo-title">Score rings</p>
+
+        <div class="row row--charts">
+          <ScoreRing
+            :value="animatedScore"
+            :size="160"
+            label="Overall"
+            :sublabel="`${completeAudit.productName} · complete`"
+          />
+          <ScoreRing
+            :value="inProgressScore"
+            :size="140"
+            label="In progress"
+            :sublabel="`${inProgressCounts.total} of ${framework.heuristics.length} rated`"
+          />
+          <ScoreRing :value="0" :size="120" label="Not started" sublabel="Draft" />
+        </div>
+        <p class="demo-desc">
+          Text summary: “{{ completeAudit.productName }}” scored
+          {{ completeScore }} percent overall.
+          “{{ inProgressAudit.productName }}” is at
+          {{ inProgressScore }} percent with
+          {{ inProgressCounts.total }} of {{ framework.heuristics.length }}
+          heuristics rated. “{{ draftAudit.productName }}” has not
+          started.
+        </p>
+      </BaseCard>
+
+      <!-- Category bars -->
+      <BaseCard padding="md" class="stack">
+        <p class="demo-title">Category breakdown · {{ completeAudit.productName }}</p>
+        <CategoryBar
+          v-for="cat in completeBreakdown"
+          :key="cat.category"
+          :label="cat.category"
+          :value="cat.score"
+          :rated-count="cat.ratedCount"
+          :meta="`${cat.ratedCount} of ${cat.total} rated`"
+        />
+      </BaseCard>
+
+      <BaseCard padding="md" class="stack">
+        <p class="demo-title">Category breakdown · {{ inProgressAudit.productName }}</p>
+        <p class="demo-desc">
+          Demonstrates partially-rated and untouched categories.
+        </p>
+        <CategoryBar
+          v-for="cat in inProgressBreakdown"
+          :key="cat.category"
+          :label="cat.category"
+          :value="cat.score"
+          :rated-count="cat.ratedCount"
+          :meta="cat.ratedCount === 0
+            ? '—'
+            : `${cat.ratedCount} of ${cat.total} rated`"
+        />
+      </BaseCard>
+
+      <!-- Severity badges + distribution -->
+      <BaseCard padding="md" class="stack">
+        <p class="demo-title">Severity indicators</p>
+        <div class="row">
+          <SeverityBadge severity="pass" />
+          <SeverityBadge severity="warning" />
+          <SeverityBadge severity="critical" />
+          <SeverityBadge severity="pass" size="sm" />
+          <SeverityBadge severity="warning" size="sm" />
+          <SeverityBadge severity="critical" size="sm" />
+        </div>
+
+        <p class="demo-title">Severity distribution · complete audit</p>
+        <SeverityDistribution
+          :pass="completeCounts.pass"
+          :warning="completeCounts.warning"
+          :critical="completeCounts.critical"
+        />
+
+        <p class="demo-title">Severity distribution · in-progress audit</p>
+        <SeverityDistribution
+          :pass="inProgressCounts.pass"
+          :warning="inProgressCounts.warning"
+          :critical="inProgressCounts.critical"
+        />
+
+        <p class="demo-title">Severity distribution · empty state</p>
+        <SeverityDistribution :pass="0" :warning="0" :critical="0" />
+      </BaseCard>
+    </section>
+
     <!-- Icons ------------------------------------------------------- -->
     <section aria-labelledby="icons-title" class="group">
       <h2 id="icons-title" class="group__title">Icons</h2>
@@ -266,6 +390,13 @@ const platformOptions = [
 
 .row--icons {
   gap: var(--space-4);
+}
+
+.row--charts {
+  gap: var(--space-4);
+  justify-content: flex-start;
+  align-items: flex-end;
+  flex-wrap: wrap;
 }
 
 .icon-demo {
