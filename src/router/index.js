@@ -29,6 +29,17 @@ const routes = [
     component: () => import('@/pages/SettingsPage.vue'),
     meta: { title: 'Settings' },
   },
+  // Dev-only routes — never bundled in production builds.
+  ...(import.meta.env.DEV
+    ? [
+        {
+          path: '/dev/components',
+          name: 'dev-components',
+          component: () => import('@/pages/DevComponentsPage.vue'),
+          meta: { title: 'Components (dev)' },
+        },
+      ]
+    : []),
   {
     // Catch-all: send unknown paths back to Overview.
     path: '/:pathMatch(.*)*',
