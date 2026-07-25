@@ -1,0 +1,149 @@
+/* =====================================================================
+   Design Tokens — UX Heuristics Audit Tool
+   ---------------------------------------------------------------------
+   Single source of truth for the design system.
+   All colors, spacing, radii, typography, elevation, and motion values
+   used across the app must reference these tokens. Never hardcode.
+   ===================================================================== */
+
+:root {
+  /* ------------------------------------------------------------------
+     Ambient Background Gradient
+     ------------------------------------------------------------------ */
+  --color-bg-ambient-start: #BAE6FD; /* Sky Blue */
+  --color-bg-ambient-mid:   #DDD6FE; /* Soft Lavender */
+  --color-bg-ambient-end:   #FCE7F3; /* Pale Blush */
+
+  --gradient-ambient: linear-gradient(
+    135deg,
+    var(--color-bg-ambient-start) 0%,
+    var(--color-bg-ambient-mid) 50%,
+    var(--color-bg-ambient-end) 100%
+  );
+
+  /* ------------------------------------------------------------------
+     Surface & Border
+     ------------------------------------------------------------------ */
+  --color-surface-card:  #FFFFFF;
+  --color-border-subtle: #F1F5F9; /* Slate 100 — for nested card borders */
+
+  /* ------------------------------------------------------------------
+     Text
+     ------------------------------------------------------------------ */
+  --color-text-primary:   #0F172A; /* Slate 900 */
+  --color-text-secondary: #64748B; /* Slate 500 */
+  --color-text-tertiary:  #94A3B8; /* Slate 400 */
+  --color-text-on-accent: #FFFFFF;
+
+  /* ------------------------------------------------------------------
+     Interactive Gradient Accent (score rings, progress bars, CTAs)
+     ------------------------------------------------------------------ */
+  --color-accent-start: #F43F5E; /* Rose 500 */
+  --color-accent-end:   #8B5CF6; /* Violet 500 */
+
+  --gradient-accent: linear-gradient(
+    135deg,
+    var(--color-accent-start) 0%,
+    var(--color-accent-end) 100%
+  );
+
+  /* ------------------------------------------------------------------
+     Semantic Status — severity for heuristic ratings
+     ------------------------------------------------------------------ */
+  --color-pass:     #10B981; /* Emerald 500 */
+  --color-warning:  #F59E0B; /* Amber 500 */
+  --color-critical: #EF4444; /* Red 500 */
+  --color-info:     #3B82F6; /* Blue 500 */
+
+  /* ------------------------------------------------------------------
+     Spacing Scale — 8px grid
+     ------------------------------------------------------------------ */
+  --space-0:  0;
+  --space-1:  4px;   /* half-step for micro-adjustments only */
+  --space-2:  8px;
+  --space-3:  16px;
+  --space-4:  24px;
+  --space-5:  32px;
+  --space-6:  40px;
+  --space-7:  48px;
+  --space-8:  64px;
+  --space-9:  80px;
+  --space-10: 96px;
+
+  /* ------------------------------------------------------------------
+     Border Radius
+     ------------------------------------------------------------------ */
+  --radius-xs:          8px;
+  --radius-sm:          12px;
+  --radius-md:          16px;
+  --radius-card:        24px;   /* Primary white cards (brief: 20–24px) */
+  --radius-card-nested: 16px;   /* Nested cards inside a primary card */
+  --radius-input:       12px;
+  --radius-button:      9999px; /* Pill per brief */
+  --radius-pill:        9999px;
+  --radius-full:        9999px;
+
+  /* ------------------------------------------------------------------
+     Elevation / Shadow
+     ------------------------------------------------------------------ */
+  --shadow-card:       0 10px 40px -10px rgba(15, 23, 42, 0.08);
+  --shadow-card-hover: 0 16px 48px -12px rgba(15, 23, 42, 0.12);
+  --shadow-fab:        0 12px 32px -8px rgba(139, 92, 246, 0.35);
+  --shadow-nested:     0 2px 8px -2px rgba(15, 23, 42, 0.04);
+
+  /* ------------------------------------------------------------------
+     Typography — Inter, weight-first hierarchy
+     ------------------------------------------------------------------ */
+  --font-family-base: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  --font-weight-regular:  400;
+  --font-weight-medium:   500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:     700;
+
+  /* Sizes drawn from brief typography table */
+  --font-size-h1:      3.5rem;   /* 56px — score display */
+  --font-size-h2:      1.5rem;   /* 24px — card titles */
+  --font-size-body:    1rem;     /* 16px — labels */
+  --font-size-body-sm: 0.875rem; /* 14px — descriptions */
+  --font-size-meta:    0.75rem;  /* 12px — microcopy / axes */
+
+  --line-height-tight: 1.15;
+  --line-height-snug:  1.3;
+  --line-height-base:  1.5;
+
+  --letter-spacing-tight: -0.02em;
+  --letter-spacing-base:  0;
+
+  /* ------------------------------------------------------------------
+     Motion
+     ------------------------------------------------------------------ */
+  --duration-fast:    150ms;
+  --duration-default: 300ms;
+  --duration-slow:    450ms;
+
+  --easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --easing-decel:    cubic-bezier(0, 0, 0.2, 1);
+  --easing-accel:    cubic-bezier(0.4, 0, 1, 1);
+
+  --transition-default: 300ms ease-in-out;
+  --transition-fast:    150ms ease-in-out;
+
+  /* ------------------------------------------------------------------
+     Layout
+     ------------------------------------------------------------------ */
+  --container-max:      480px; /* Mobile-first primary content column */
+  --nav-height:         72px;  /* Bottom tab bar */
+  --safe-inset-bottom:  env(safe-area-inset-bottom, 0px);
+  --safe-inset-top:     env(safe-area-inset-top, 0px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast:    0ms;
+    --duration-default: 0ms;
+    --duration-slow:    0ms;
+    --transition-default: 0ms linear;
+    --transition-fast:    0ms linear;
+  }
+}

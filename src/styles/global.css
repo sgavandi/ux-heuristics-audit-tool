@@ -1,0 +1,88 @@
+/* =====================================================================
+   Global Styles
+   ---------------------------------------------------------------------
+   Minimal reset + application-wide baseline. Component-level styles
+   live with their components. Design tokens live in tokens.css.
+   ===================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+html {
+  /* Prevent iOS text auto-inflation on landscape rotation. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-base);
+  color: var(--color-text-primary);
+
+  background: var(--gradient-ambient);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-synthesis: none;
+}
+
+#app {
+  min-height: 100vh;
+}
+
+/* --------------------------------------------------------------------
+   Vuetify override: let the ambient gradient show through.
+   Vuetify's v-application paints a solid background by default.
+   -------------------------------------------------------------------- */
+.v-application,
+.v-application__wrap,
+.v-main {
+  background: transparent !important;
+}
+
+/* --------------------------------------------------------------------
+   Focus visibility — WCAG 2.2 AA
+   -------------------------------------------------------------------- */
+:focus-visible {
+  outline: 2px solid var(--color-accent-end);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+
+/* --------------------------------------------------------------------
+   Typography base
+   -------------------------------------------------------------------- */
+h1, h2, h3, h4, h5, h6, p {
+  margin: 0;
+}
+
+h1 {
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
+  color: var(--color-text-primary);
+}
+
+h2 {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-snug);
+  color: var(--color-text-primary);
+}
