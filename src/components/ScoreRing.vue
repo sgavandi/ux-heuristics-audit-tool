@@ -119,6 +119,13 @@ const ariaLabel = computed(() => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  /*
+   * Establish a size container so the inner typography can scale
+   * relative to the ring's actual dimensions using `cqmin` units.
+   * This keeps values from `0%` to `100%` comfortably inside the
+   * circle regardless of the `size` prop.
+   */
+  container-type: size;
 }
 
 .ring__arc {
@@ -137,25 +144,37 @@ const ariaLabel = computed(() => {
   justify-content: center;
   gap: 2px;
   text-align: center;
-  padding: var(--space-3);
+  /*
+   * Padding scales with the ring so the text always has breathing
+   * room from the stroke, even at "100%".
+   */
+  padding: 12cqmin;
 }
 
 .ring__value {
-  font-size: var(--font-size-h1);
+  /*
+   * Scale the percentage relative to the ring's smaller dimension.
+   * ~20% of the ring diameter keeps "100%" (4 chars) inside the
+   * inner circle with comfortable padding, while `clamp()` guards
+   * against extreme container sizes.
+   */
+  font-size: clamp(1.25rem, 20cqmin, 2.75rem);
   font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
   line-height: 1;
   letter-spacing: -0.02em;
+  /* Prevent any accidental wrapping of e.g. "100%". */
+  white-space: nowrap;
 }
 
 .ring__label {
-  font-size: var(--font-size-body-sm);
+  font-size: clamp(0.75rem, 7cqmin, var(--font-size-body-sm));
   font-weight: var(--font-weight-medium);
   color: var(--color-text-secondary);
 }
 
 .ring__sublabel {
-  font-size: var(--font-size-meta);
+  font-size: clamp(0.6875rem, 6cqmin, var(--font-size-meta));
   color: var(--color-text-tertiary);
 }
 </style>
