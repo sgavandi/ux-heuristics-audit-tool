@@ -46,6 +46,14 @@ cp .env.example .env.local
 | Variable            | Purpose                                              |
 | ------------------- | ---------------------------------------------------- |
 | `VITE_API_BASE_URL` | Base URL for the audits API. Leave blank to use the local mock dataset in `src/services/mockData.js`. |
+| `SITE_PASSWORD`     | **Server-side only.** When set on Vercel, the Edge Middleware in [middleware.js](middleware.js) protects the deployment with HTTP Basic Auth (username `review`, password = this value). Leave empty to disable the gate. Never committed to the repo. |
+
+## Deployment
+
+Hosted on Vercel (project `ux-heuristics-audit-tool`). SPA routing is
+configured via [vercel.json](vercel.json). Access is gated by the Edge
+Middleware in [middleware.js](middleware.js) — set `SITE_PASSWORD` on the
+Vercel environment and share the value with reviewers out-of-band.
 
 ## Project structure
 
