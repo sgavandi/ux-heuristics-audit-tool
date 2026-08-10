@@ -11,6 +11,7 @@
  */
 
 import { audits as mockAudits, frameworks as mockFrameworks } from './mockData.js'
+import { generateMockRatings } from '@/utils/aiAudit.js'
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || ''
 const USE_REMOTE = Boolean(API_BASE)
@@ -196,4 +197,70 @@ export async function deleteAudit(auditId) {
     const index = mockAudits.findIndex((a) => a.id === auditId)
     if (index >= 0) mockAudits.splice(index, 1)
   })
+}
+
+/**
+ * Apply a batch of ratings to an audit in a single round-trip and mark
+ * it in-progress. Used by the AI-assisted audit flow.
+ *
+ * @param {string} auditId
+ * @param {Array<{ heuristicId: string, severity: 'pass'|'warning'|'critical', note?: string }>} ratings
+ * @returns {Promise<Audit>}
+ */
+export async function applyRatingsBatch(auditId, ratings) {
+  if (USE_REMOTE) {
+    const response = await fetch(`${API_BASE}/audits/${auditId}/ratings`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({ ratings }),
+    })
+    if (!response.ok) throw new Error(`Batch rate failed (${response.status})`)
+    return response.json()
+  }
+  return mutate(() => {
+    const audit = mockAudits.find((a) => a.id === auditId)
+    if (!audit) throw new Error(`Audit ${auditId} not found`)
+    for (const patch of ratings) {
+      const existing = audit.ratings.find((r) => r.heuristicId === patch.heuristicId)
+      if (existing) {
+        existing.severity = patch.severity
+        if (patch.note !== undefined) existing.note = patch.note
+      } else {
+        audit.ratings.push({
+          heuristicId: patch.heuristicId,
+          severity: patch.severity,
+          ...(patch.note ? { note: patch.note } : {}),
+        })
+      }
+    }
+    if (audit.status === 'draft') audit.status = 'in-progress'
+    audit.updatedAt = new Date().toISOString()
+    return clone(audit)
+  })
+}
+
+/**
+ * Ask the server to generate a full set of ratings for a heuristic
+ * framework using an LLM. When the endpoint is unreachable (e.g. in
+ * `npm run dev` without `vercel dev`), falls back to the deterministic
+ * client-side generator so the flow always completes.
+ *
+ * @param {{ productName: string, platform: string, description?: string, url?: string, heuristics: Array<any> }} input
+ * @returns {Promise<{ ratings: Array<{ heuristicId: string, severity: string, note: string }>, source: 'openai'|'mock' }>}
+ */
+export async function generateAiRatings(input) {
+  try {
+    const response = await fetch('/api/ai-audit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify(input),
+    })
+    if (!response.ok) throw new Error(`AI audit failed (${response.status})`)
+    return await response.json()
+  } catch (error) {
+    // Fall back to the client-side mock so the app works without a
+    // serverless runtime (e.g. `npm run dev`).
+    const ratings = generateMockRatings(input)
+    return { ratings, source: 'mock' }
+  }
 }

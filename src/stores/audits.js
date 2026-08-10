@@ -7,6 +7,8 @@ import {
   upsertRating as upsertRatingRemote,
   setAuditStatus as setAuditStatusRemote,
   deleteAudit as deleteAuditRemote,
+  applyRatingsBatch as applyRatingsBatchRemote,
+  generateAiRatings as generateAiRatingsRemote,
 } from '@/services/dataService.js'
 
 /**
@@ -144,6 +146,41 @@ export const useAuditsStore = defineStore('audits', () => {
     audits.value = audits.value.filter((a) => a.id !== auditId)
   }
 
+  /**
+   * Apply a batch of ratings to an audit in one call. Returns the
+   * updated audit.
+   * @param {string} auditId
+   * @param {Array<{ heuristicId: string, severity: string, note?: string }>} ratings
+   */
+  async function applyRatings(auditId, ratings) {
+    const next = await applyRatingsBatchRemote(auditId, ratings)
+    _replaceAudit(next)
+    return next
+  }
+
+  /**
+   * Ask the AI to generate ratings for the given audit and apply them.
+   * Returns the updated audit and the source of the ratings.
+   * @param {string} auditId
+   * @param {{ description?: string, url?: string }} [context]
+   */
+  async function runAiAudit(auditId, context = {}) {
+    const audit = getAuditById(auditId)
+    if (!audit) throw new Error(`Audit ${auditId} not found`)
+    const framework = getFrameworkById(audit.frameworkId)
+    if (!framework) throw new Error(`Framework for audit ${auditId} not found`)
+
+    const { ratings, source } = await generateAiRatingsRemote({
+      productName: audit.productName,
+      platform: audit.platform,
+      description: context.description ?? '',
+      url: context.url ?? '',
+      heuristics: framework.heuristics,
+    })
+    const updated = await applyRatings(auditId, ratings)
+    return { audit: updated, source }
+  }
+
   function reset() {
     audits.value = []
     frameworks.value = []
@@ -174,6 +211,8 @@ export const useAuditsStore = defineStore('audits', () => {
     setRating,
     setStatus,
     removeAudit,
+    applyRatings,
+    runAiAudit,
     reset,
   }
 })

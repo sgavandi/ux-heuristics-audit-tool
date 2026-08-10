@@ -55,6 +55,8 @@ export function useAudits({ autoLoad = true } = {}) {
     setRating: store.setRating,
     setStatus: store.setStatus,
     removeAudit: store.removeAudit,
+    applyRatings: store.applyRatings,
+    runAiAudit: store.runAiAudit,
     reset: store.reset,
   }
 }
