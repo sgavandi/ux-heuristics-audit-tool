@@ -4,6 +4,28 @@ A mobile-first Vue 3 app for running lightweight UX heuristic audits — pick a
 framework (e.g. Nielsen's 10), tap through the heuristics, mark each Pass /
 Warning / Critical, add notes, and watch the score update live.
 
+This is the case-study build for **Protogen P303 — Mobile Experience**. The
+target user is a UX researcher / design leader running an audit on their
+phone during a product review. See [BRIEF.md](BRIEF.md) for the full brief
+and [PLAN.md](PLAN.md) for the phased build order.
+
+## For reviewers
+
+1. Open the deployed URL shared out-of-band.
+2. When prompted for HTTP Basic credentials, use username `review` and the
+   password shared with your review invite.
+3. Try the core flows:
+   - **Overview** → tap **New audit** → fill in product name and platform →
+     confirm the audit appears in **Active audits**.
+   - Open the new audit → rate a few heuristics as Pass / Warning / Critical
+     and watch the score ring, category bars, and severity distribution
+     update live.
+   - Return to **Overview** — the summary tiles reflect the new state.
+   - Navigate to **History** and **Settings** to sanity-check empty and
+     supporting states.
+4. Resize the browser to 320 px width; the layout is designed to hold at
+   that width in portrait.
+
 ## Design
 
 - Ambient sky → lavender → blush gradient background
@@ -12,7 +34,7 @@ Warning / Critical, add notes, and watch the score update live.
 - Pill buttons, Inter font, mobile-first 4-tab bottom navigation
 - WCAG 2.2 AA compliant (axe-core: 0 violations across all routes)
 
-Full brief: [BRIEF.MD](BRIEF.MD). Build plan: [PLAN.MD](PLAN.MD).
+Full brief: [BRIEF.md](BRIEF.md). Build plan: [PLAN.md](PLAN.md).
 
 ## Stack
 

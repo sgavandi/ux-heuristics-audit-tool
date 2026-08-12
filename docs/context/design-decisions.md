@@ -1,7 +1,7 @@
 # Design decisions
 
 A short log of the intentional calls behind the visual and interaction design.
-Read this alongside [BRIEF.MD](../../BRIEF.MD) for the reasoning behind the
+Read this alongside [BRIEF.md](../../BRIEF.md) for the reasoning behind the
 build.
 
 ## Why "Ambient Gradient & 3D Accent"

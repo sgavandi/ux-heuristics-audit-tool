@@ -1,7 +1,39 @@
-#Project Brief: UX Heuristics Audit Tool
+# Project Brief: UX Heuristics Audit Tool
 
+## Case Study Context
 
-##Overview
+- **Program:** Protogen Certification — Case Study **P303 — Mobile Experience**.
+- **Industry:** Professional Services (UX consulting / design practice).
+- **Primary user:** A UX researcher or design leader running a live heuristic
+  audit on their phone during a product review, competitive walkthrough, or
+  client meeting.
+- **Primary task:** Set up an audit, rate a screen against a heuristic
+  framework (default: Nielsen's 10) as Pass / Warning / Critical, capture a
+  short note per finding, and generate a shareable severity report — all
+  one-handed, in portrait, from 320 px up.
+- **Why mobile-first:** Audits happen away from a desk. The reviewer's phone
+  is already in-hand while they walk through the product being evaluated.
+  Everything below flows from that constraint.
+
+## Success criteria (P303 review dimensions)
+
+1. **Does it work?** Deployed on Vercel, gated by Basic Auth. Core flows
+   (create audit → rate heuristics → view live score → open report) work
+   end-to-end against the in-memory mock dataset with realistic latency, so
+   loading / empty / error states are always exercised.
+2. **Is the repo set up right?** AI scaffolding
+   ([AGENTS.md](AGENTS.md), [.github/copilot-instructions.md](.github/copilot-instructions.md),
+   [docs/context/](docs/context/)), README, LICENSE, phased commit history,
+   and design tokens ([src/styles/tokens.css](src/styles/tokens.css)) all
+   live where a reviewer expects them.
+3. **Does it look right and show the thinking?** The visual language is
+   deliberately opposed to the spreadsheet + PDF status quo of heuristic
+   audits — soft ambient gradient, pure-white cards, rose→violet accent — and
+   every design decision is anchored to a token, not to a hex value pasted
+   into a component.
+
+## Overview
+
 A responsive, mobile-first utility app designed for UX practitioners and design leaders to conduct rapid heuristic evaluations in the field. This tool replaces cumbersome spreadsheets and static PDFs, allowing evaluators to walk through a product screen-by-screen, rate usability against established heuristics, and instantly generate shareable, visual severity reports. The design aesthetic is premium and modern, utilizing an "Ambient Gradient & 3D Accent" style that balances professional utility with an airy, engaging interface.
 
 

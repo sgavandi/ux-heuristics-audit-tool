@@ -14,8 +14,8 @@ field. Case-study target: **P303 — Mobile Experience**.
 ## Reading order for context
 
 1. [AGENTS.md](../AGENTS.md) — non-negotiable rules for AI assistants
-2. [BRIEF.MD](../BRIEF.MD) — product brief
-3. [PLAN.MD](../PLAN.MD) — phased build order
+2. [BRIEF.md](../BRIEF.md) — product brief
+3. [PLAN.md](../PLAN.md) — phased build order
 4. [src/styles/tokens.css](../src/styles/tokens.css) — design tokens
 5. [README.md](../README.md) — stack and scripts
 6. [docs/context/](../docs/context/) — deeper notes

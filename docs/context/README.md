@@ -2,7 +2,7 @@
 
 Deeper reference material for humans and AI assistants working on this repo.
 Start here after reading [AGENTS.md](../../AGENTS.md) and
-[BRIEF.MD](../../BRIEF.MD).
+[BRIEF.md](../../BRIEF.md).
 
 | Doc                                        | What it covers                                          |
 | ------------------------------------------ | ------------------------------------------------------- |

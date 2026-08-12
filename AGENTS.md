@@ -12,8 +12,8 @@ authoritative for this repository. Read the linked docs before editing.
 
 Before making any change, load the following files into context:
 
-1. [BRIEF.MD](BRIEF.MD) — product brief: users, design language, features.
-2. [PLAN.MD](PLAN.MD) — phased build order and per-phase review checklists.
+1. [BRIEF.md](BRIEF.md) — product brief: users, design language, features.
+2. [PLAN.md](PLAN.md) — phased build order and per-phase review checklists.
 3. [src/styles/tokens.css](src/styles/tokens.css) — the single source of truth
    for colors, spacing, radii, typography, elevation, and motion.
 4. [README.md](README.md) — stack, scripts, project structure, data model.
